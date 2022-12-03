@@ -110,18 +110,23 @@ export function parseDateMath(
   const dateTime = time;
   let i = 0;
   const len = strippedMathString.length;
-
   const nextChar = () => {
     return strippedMathString.charAt(i++);
   };
 
-  while (i < len) {
-    const getNum = () => {
+  const handleDateTime = () => {
+    /**
+     * Iterate through the `strippedMathString` and find the number part in the string
+     * e.g.
+     * 1. 100M will return 100,
+     * 2. 20d will return 20
+     * 3. d will return 1 (base case)
+     * 4. 0.5y will return 0
+     * 5. 20d-6h will return 20
+     */
+    const findNumByIterate = () => {
       if (!isNumber(strippedMathString.charAt(i))) {
         return 1;
-      }
-      if (strippedMathString.length === 2) {
-        return parseInt(strippedMathString.charAt(i), 10);
       }
 
       const numFrom = i;
@@ -135,7 +140,7 @@ export function parseDateMath(
     };
 
     const type = MATH_OP_TYPE_MAP[nextChar()];
-    const num = getNum();
+    const num = findNumByIterate();
     const char = nextChar();
     const isFiscal = char === 'f';
     const unit = isFiscal ? nextChar() : char;
@@ -170,8 +175,14 @@ export function parseDateMath(
         break;
       default:
     }
-  }
-  return dateTime;
+    //  iterate through the `mathString` again if not reach the end yet
+    if (i < len) {
+      handleDateTime();
+    }
+    return dateTime;
+  };
+
+  return handleDateTime();
 }
 
 export function roundToFiscal(fyStartMonth: number, dateTime: any, unit: string, roundUp: boolean | undefined) {
