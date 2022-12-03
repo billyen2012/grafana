@@ -114,6 +114,29 @@ describe('DateMath', () => {
     });
   });
 
+  describe('isNumber', () => {
+    it('should validate if the input is a valid number', () => {
+      [
+        { test: '0', result: true },
+        { test: '1', result: true },
+        { test: '1.0', result: true },
+        { test: '1.A', result: false },
+        { test: '1234567890', result: true },
+        { test: 'a1234567890', result: false },
+        { test: '1234567890a', result: false },
+        { test: 'A', result: false },
+        { test: '01', result: true },
+        { test: 0, result: true },
+        { test: 1, result: true },
+        { test: 1.0, result: true },
+        { test: '1234567890', result: true },
+        { test: 1234567890, result: true },
+      ].forEach(({ test, result }) => {
+        expect(dateMath.isNumber(test)).toBe(result);
+      });
+    });
+  });
+
   describe('relative time to date parsing', () => {
     it('should handle negative time', () => {
       const date = dateMath.parseDateMath('-2d', dateTime([2014, 1, 5]));
