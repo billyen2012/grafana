@@ -125,25 +125,26 @@ export function parseDateMath(
      * 5. 20d-6h will return 20
      */
     const findNumByIterate = () => {
-      if (!isNumber(strippedMathString.charAt(i))) {
-        return 1;
+      let currentChar = strippedMathString.charAt(i);
+      if (!isNumber(currentChar)) {
+        return [1, currentChar];
       }
 
       const numFrom = i;
-      while (!isNumber(nextChar())) {
+      while (isNumber(currentChar)) {
         if (i > MAX_DATE_MATH_STRING_LENGTH) {
-          return undefined;
+          return [undefined, currentChar];
         }
+        currentChar = nextChar();
       }
 
-      return parseInt(strippedMathString.substring(numFrom, i), 10);
+      return [parseInt(strippedMathString.substring(numFrom, i), 10), currentChar];
     };
 
     const type = MATH_OP_TYPE_MAP[nextChar()];
-    const num = findNumByIterate();
-    const char = nextChar();
-    const isFiscal = char === 'f';
-    const unit = isFiscal ? nextChar() : char;
+    const [num, currentChar] = findNumByIterate();
+    const isFiscal = currentChar === 'f';
+    const unit = isFiscal ? nextChar() : currentChar;
 
     if (
       typeof type === 'undefined' ||
